@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduBot - School Helpdesk</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .chat-container {
+            width: 100%;
+            max-width: 500px;
+            height: 700px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 25px;
+            text-align: center;
+            position: relative;
+        }
+
+        .bot-avatar {
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 24px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .chat-header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .chat-header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #f8fafc;
+        }
+
+        .message {
+            margin-bottom: 20px;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.bot {
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .message.user {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .message-content {
+            max-width: 80%;
+            padding: 15px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .message.bot .message-content {
+            background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+            color: #374151;
+            border-bottom-left-radius: 5px;
+            margin-left: 10px;
+        }
+
+        .message.user .message-content {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+
+        .bot-icon {
+            width: 35px;
+            height: 35px;
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .chat-input-container {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .chat-input-wrapper {
+            display: flex;
+            align-items: center;
+            background: #f9fafb;
+            border: 2px solid #e5e7eb;
+            border-radius: 25px;
+            padding: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .chat-input-wrapper:focus-within {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .chat-input {
+            flex: 1;
+            border: none;
+            outline: none;
+            padding: 12px 15px;
+            font-size: 14px;
+            background: transparent;
+            color: #374151;
+        }
+
+        .chat-input::placeholder {
+            color: #9ca3af;
+        }
+
+        .send-button {
+            width: 40px;
+            height: 40px;
+            border: none;
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .send-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(79, 70, 229, 0.3);
+        }
+
+        .send-button:active {
+            transform: scale(0.95);
+        }
+
+        .typing-indicator {
+            display: none;
+            padding: 15px 20px;
+            margin-left: 45px;
+            background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+            border-radius: 20px;
+            border-bottom-left-radius: 5px;
+            max-width: 80px;
+            margin-bottom: 20px;
+        }
+
+        .typing-dots {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .typing-dots span {
+            width: 6px;
+            height: 6px;
+            background: #6b7280;
+            border-radius: 50%;
+            margin: 0 2px;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+            30% { transform: translateY(-10px); opacity: 1; }
+        }
+
+        .quick-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 15px;
+            padding: 0 20px;
+        }
+
+        .quick-button {
+            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+            border: 1px solid #d1d5db;
+            color: #374151;
+            padding: 8px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .quick-button:hover {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .scrollbar-hide {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+
+        @media (max-width: 600px) {
+            .chat-container {
+                height: 100vh;
+                border-radius: 0;
+                max-width: 100%;
+            }
+            
+            body {
+                padding: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <div class="bot-avatar">🤖</div>
+            <h1>EduBot</h1>
+            <p>Your School Helpdesk Assistant</p>
+        </div>
+        
+        <div class="chat-messages scrollbar-hide" id="chatMessages">
+            <div class="message bot">
+                <div class="bot-icon">🤖</div>
+                <div class="message-content">
+                    Hello! I'm EduBot, your school helpdesk assistant. How can I help you today?
+                </div>
+            </div>
+        </div>
+        
+        <div class="typing-indicator" id="typingIndicator">
+            <div class="typing-dots">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="quick-buttons">
+            <button class="quick-button" onclick="sendQuickMessage('Library hours')">📚 Library Hours</button>
+            <button class="quick-button" onclick="sendQuickMessage('Class schedule')">📅 Schedule</button>
+            <button class="quick-button" onclick="sendQuickMessage('Cafeteria menu')">🍽️ Food</button>
+            <button class="quick-button" onclick="sendQuickMessage('Parking info')">🚗 Parking</button>
+            <button class="quick-button" onclick="sendQuickMessage('Office hours')">🏢 Office Hours</button>
+        </div>
+        
+        <div class="chat-input-container">
+            <div class="chat-input-wrapper">
+                <input type="text" class="chat-input" id="chatInput" placeholder="Type your message here..." />
+                <button class="send-button" id="sendButton" onclick="sendMessage()">
+                    ➤
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class SchoolChatbot {
+            constructor() {
+                this.responses = {
+                    greeting: [
+                        "Hello! I'm EduBot, your school helpdesk assistant. How can I help you today?",
+                        "Hi there! Welcome to the school helpdesk. What can I assist you with?",
+                        "Greetings! I'm here to help with your school-related questions."
+                    ],
+                    schedule: [
+                        "📅 For class schedules, please check your student portal or contact the registrar's office at ext. 1234.",
+                        "🕐 You can find your class schedule in the student portal. If you need help accessing it, contact IT support.",
+                        "📋 Class schedules are available online. Would you like me to help you with anything else?"
+                    ],
+                    library: [
+                        "📚 The library is open Monday-Friday 8AM-8PM, weekends 10AM-6PM.",
+                        "💻 You can access library resources online 24/7. For physical books, visit during operating hours.",
+                        "📖 Need help with research? The library offers tutoring sessions every Tuesday and Thursday."
+                    ],
+                    food: [
+                        "🍽️ Today's cafeteria menu is available on the school website under 'Student Life'.",
+                        "⏰ The cafeteria serves breakfast 7-9AM and lunch 11AM-2PM.",
+                        "🥗 For dietary restrictions or special meals, contact food services at ext. 5678."
+                    ],
+                    tech: [
+                        "💻 For technical issues, contact IT support at ithelp@school.edu or ext. 9999.",
+                        "📶 Having trouble with WiFi? Try reconnecting or contact IT support for assistance.",
+                        "🔧 IT support offers walk-in help at the tech center, room 101, weekdays 9AM-5PM."
+                    ],
+                    financial: [
+                        "💰 For financial aid questions, visit the financial aid office or call ext. 3456.",
+                        "📅 Financial aid applications are due by March 1st for the following academic year.",
+                        "📋 Need help with FAFSA? The financial aid office offers workshops every Friday."
+                    ],
+                    sports: [
+                        "🏃‍♂️ The gym is open weekdays 6AM-10PM, weekends 8AM-8PM.",
+                        "⚽ For sports teams and athletics, contact the athletic department at ext. 7777.",
+                        "🏊‍♀️ Pool hours are Monday-Friday 6AM-9PM, weekends 10AM-6PM."
+                    ],
+                    events: [
+                        "🎉 Check the school calendar on our website for upcoming events and activities.",
+                        "🎭 Student clubs meet various times - check the student activities board for schedules.",
+                        "📅 For event planning or club registration, contact student affairs at ext. 4444."
+                    ],
+                    parking: [
+                        "🚗 Student parking is available in lots A, B, and C. Permits required!",
+                        "🅿️ Parking permits can be purchased at the security office for $50/semester.",
+                        "🚙 Visitor parking is available in the main lot - no permit needed for visits under 2 hours."
+                    ],
+                    office: [
+                        "🏢 Main office hours: Monday-Friday 8AM-5PM, Saturday 9AM-1PM.",
+                        "👥 Dean's office hours: Tuesday-Thursday 10AM-3PM, or by appointment.",
+                        "📞 For after-hours assistance, call the security desk at ext. 0000."
+                    ],
+                    default: [
+                        "🤔 I'm sorry, I don't understand that question. Can you try rephrasing it?",
+                        "❓ I'm not sure about that. Would you like me to connect you with a human advisor?",
+                        "📞 That's outside my knowledge. Please contact the main office at ext. 1000 for assistance."
+                    ],
+                    goodbye: [
+                        "👋 Goodbye! Have a great day at school!",
+                        "✨ Thanks for using the school helpdesk. See you later!",
+                        "🌟 Take care! Don't hesitate to ask if you need more help."
+                    ]
+                };
+
+                this.patterns = {
+                    greeting: ['hello', 'hi', 'hey', 'good morning', 'good afternoon', 'greetings'],
+                    schedule: ['schedule', 'class', 'classes', 'timetable', 'when', 'time'],
+                    library: ['library', 'books', 'study', 'research', 'reading'],
+                    food: ['food', 'cafeteria', 'lunch', 'breakfast', 'eat', 'menu', 'dining'],
+                    tech: ['computer', 'wifi', 'internet', 'password', 'login', 'technical', 'it'],
+                    financial: ['financial aid', 'money', 'tuition', 'scholarship', 'fafsa', 'payment'],
+                    sports: ['gym', 'sports', 'athletics', 'pool', 'fitness', 'exercise'],
+                    events: ['events', 'activities', 'clubs', 'calendar', 'happening'],
+                    parking: ['parking', 'car', 'vehicle', 'lot', 'permit'],
+                    office: ['office', 'hours', 'staff', 'administration', 'dean'],
+                    goodbye: ['bye', 'goodbye', 'see you', 'thanks', 'thank you', 'exit', 'quit']
+                };
+
+                this.setupEventListeners();
+            }
+
+            setupEventListeners() {
+                const chatInput = document.getElementById('chatInput');
+                const sendButton = document.getElementById('sendButton');
+
+                chatInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        this.sendMessage();
+                    }
+                });
+
+                sendButton.addEventListener('click', () => {
+                    this.sendMessage();
+                });
+            }
+
+            getResponseType(userInput) {
+                const input = userInput.toLowerCase();
+                
+                for (const [responseType, keywords] of Object.entries(this.patterns)) {
+                    for (const keyword of keywords) {
+                        if (input.includes(keyword)) {
+                            return responseType;
+                        }
+                    }
+                }
+                
+                return 'default';
+            }
+
+            getResponse(userInput) {
+                const responseType = this.getResponseType(userInput);
+                const responses = this.responses[responseType];
+                return responses[Math.floor(Math.random() * responses.length)];
+            }
+
+            sendMessage() {
+                const chatInput = document.getElementById('chatInput');
+                const message = chatInput.value.trim();
+                
+                if (!message) return;
+
+                this.addMessage(message, 'user');
+                chatInput.value = '';
+
+                this.showTypingIndicator();
+                
+                setTimeout(() => {
+                    this.hideTypingIndicator();
+                    const response = this.getResponse(message);
+                    this.addMessage(response, 'bot');
+                }, 1000 + Math.random() * 1000);
+            }
+
+            addMessage(message, sender) {
+                const chatMessages = document.getElementById('chatMessages');
+                const messageDiv = document.createElement('div');
+                messageDiv.classList.add('message', sender);
+
+                if (sender === 'bot') {
+                    messageDiv.innerHTML = `
+                        <div class="bot-icon">🤖</div>
+                        <div class="message-content">${message}</div>
+                    `;
+                } else {
+                    messageDiv.innerHTML = `
+                        <div class="message-content">${message}</div>
+                    `;
+                }
+
+                chatMessages.appendChild(messageDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+
+            showTypingIndicator() {
+                const typingIndicator = document.getElementById('typingIndicator');
+                typingIndicator.style.display = 'block';
+                
+                const chatMessages = document.getElementById('chatMessages');
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+
+            hideTypingIndicator() {
+                const typingIndicator = document.getElementById('typingIndicator');
+                typingIndicator.style.display = 'none';
+            }
+        }
+
+        function sendQuickMessage(message) {
+            const chatInput = document.getElementById('chatInput');
+            chatInput.value = message;
+            chatbot.sendMessage();
+        }
+
+        // Initialize the chatbot
+        const chatbot = new SchoolChatbot();
+    </script>
+</body>
+</html>
