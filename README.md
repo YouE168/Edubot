@@ -117,9 +117,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 👨‍💻 Author
 
 **Your Name**
-- GitHub: [@yourusername](https://github.com/yourusername)
-- LinkedIn: [Your LinkedIn](https://linkedin.com/in/yourprofile)
-- Email: your.email@example.com
+- GitHub: [YouE168](https://github.com/youe168)
+- LinkedIn: [You E Kry](https://www.linkedin.com/in/you-e-kry-96897126b/)
+- Email: kry.ue59@gmail.com
 
 ## 🙏 Acknowledgments
 
@@ -137,3 +137,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 ⭐ **Star this repository if you found it helpful!**
+# Edubot
