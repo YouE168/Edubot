@@ -11,17 +11,6 @@ A responsive web-based chatbot designed to assist students with common school-re
 - **Typing Indicators**: Realistic chat experience with animated typing dots
 - **Multiple Topics**: Handles queries about library, schedules, food, parking, and more
 
-## 🚀 Live Demo
-
-[View Live Demo](https://yourusername.github.io/school-chatbot) *(Update this link after deployment)*
-
-## 📸 Screenshots
-
-### Desktop View
-![Desktop Screenshot](screenshots/desktop-view.png)
-
-### Mobile View
-![Mobile Screenshot](screenshots/mobile-view.png)
 
 ## 🛠️ Technologies Used
 
